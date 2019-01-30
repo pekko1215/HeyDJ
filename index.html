@@ -6,9 +6,17 @@
 		body{
 			margin:0;
 		}
+		#output{
+			position:absolute;
+			position: absolute;
+			left: 0;
+			z-index: -1;
+			top: 55px;
+		}
 	</style>
 </head>
 <body>
+	<img src="DJ.png">
 	<video id="dummyCamera" width="720px" autoplay hidden></video>
 	<canvas id="output" width="720" height="540"></canvas>
 	<br>
@@ -17,7 +25,7 @@
 
 	暗い色<input type="color" id="offColor" value="#220000">
 	明るい色<input type="color" id="onColor" value="#cc0000">
-
+	反転<input type="checkbox" id="reverse">
 	<script type="text/javascript" src="script.js"></script>
 </body>
 </html>

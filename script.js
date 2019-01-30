@@ -5,6 +5,8 @@ const ctx = dummyCanvas.getContext("2d");
 const displayCtx = canvas.getContext("2d");
 const range = document.getElementById('range');
 const dotSize = document.getElementById('dotSize');
+const checkBox = document.getElementById('reverse');
+
 
 const $onColor = document.getElementById('onColor')
 const $offColor = document.getElementById('offColor')
@@ -49,6 +51,9 @@ dummyCanvas.height = height;
 
 	ctx.clearRect(0,0,width,height);
 	ctx.drawImage(video,0,0,width,height);
+	if(checkBox.checked){
+		[onColor,offColor] = [offColor,onColor];
+	}
 	const imageData = ctx.getImageData(0, 0, width, height);
 	for(var x = 0;x < width/dotWidth; x++){
 		for(y = 0;y < height/dotHeight; y++){
@@ -63,7 +68,7 @@ dummyCanvas.height = height;
 				imageData.data[target+1] = (cl & 0x00FF00) >> 8;
 				imageData.data[target+2] = (cl & 0x0000FF) >> 0;
 			})
-			getRoundIndexies(x,y,dotWidth,dotHeight,width,height).forEach((idx,i)=>{
+			getDiamondIndexies(x,y,dotWidth,dotHeight,width,height).forEach((idx,i)=>{
 				var target = idx * 4;
 				imageData.data[target+0] = (offColor & 0xFF0000) >> 16;
 				imageData.data[target+1] = (offColor & 0x00FF00) >> 8;
@@ -71,7 +76,8 @@ dummyCanvas.height = height;
 			})
 		}
 	}
-	ctx.putImageData(imageData, 0, 0);
+	ctx.clearRect(0,0,width,height);
+	ctx.putImageData(imageData, 0, 0,0,0,384,640);
 	displayCtx.drawImage(dummyCanvas, 0, 0);
 	delete imageData;
 	requestAnimationFrame(draw)
@@ -97,10 +103,27 @@ function getRoundIndexies(x,y,dw,dh,width,height){
 	for(var x = xIdx;x < xIdx + dw;x++){
 		for(var y = yIdx;y < yIdx + dh;y ++){
 			if(x >= width || y >= height) continue;
-			if(x == xIdx || y == yIdx || x == xIdx + dw - 1 || y == yIdx + dh - 1){
+			if(    x == xIdx
+				|| y == yIdx
+				|| x == xIdx + dw - 1
+				|| y == yIdx + dh - 1){
 				dots.push(y * width + x);
 			}
 		}
 	}
 	return dots;
+}
+
+
+function getDiamondIndexies(dx,dy,dw,dh,width,height){
+	var dots = [];
+	var xIdx = dx * dw;
+	var yIdx = dy * dh;
+	for(var x = xIdx+1;x < xIdx + dw;x += dw - 3){
+		for(var y = yIdx+1;y < yIdx + dh;y += dh - 3){
+			if(x >= width || y >= height) continue;
+			dots.push(y * width + x);
+		}
+	}
+	return [...dots,...getRoundIndexies(dx,dy,dw,dh,width,height)];
 }
